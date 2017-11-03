@@ -1,0 +1,18 @@
+{
+	"name": "playlist-bot",
+	"version": "1.0.0",
+	"description": "bot that shuffles songs on youtube",
+	"main": "bot.js",
+	"author": "danielylee",
+	"license": "ISC",
+	"dependencies": {
+		"discord.js": "^11.2.1",
+		"fs": "0.0.1-security",
+		"get-youtube-id": "^1.0.0",
+		"opusscript": "0.0.4",
+		"request": "^2.83.0",
+		"winston": "^2.4.0",
+		"youtube-info": "^1.1.2",
+		"ytdl-core": "^0.18.1"
+	}
+}
