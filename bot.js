@@ -15,6 +15,7 @@ const PREFIX = config.prefix;
 const TOKEN = config.discord_token;
 
 var queue = [];
+var queueNames = [];
 var currentlyPlaying = false;
 var dispatcher = null;
 var voiceChannel = null;
@@ -67,18 +68,24 @@ function playMusic(id, message) {
 		stream = ytdl('https://www.youtube.com/watch?v=' + id, {
 			filter: 'audioonly'
 		});
+
 		skipRequest = 0;
 		skippers = [];
+
 		dispatcher = connection.playStream(stream);
 		dispatcher.on('end', () => {
 			skipRequest = 0;
 			skippers = [];
 			queue.shift();
+			queueNames.shift();
 			if (queue.length == 0) {
 				queue = [];
+				queueNames = [];
 				currentlyPlaying = false;
 			} else {
-				playMusic(queue[0], message);
+				setTimeout(() => {
+					playMusic(queue[0], message);
+				}, 500);
 			}
 		});
 	});
@@ -97,8 +104,6 @@ function skipMusic(message) {
 
 bot.on('ready', (event) => {
 	logger.info('Connected');
-	logger.info('Logged in as: ');
-	logger.info(bot.username + ' - (' + bot.id + ')');
 });
 
 bot.on('message', (message) => {
@@ -107,24 +112,26 @@ bot.on('message', (message) => {
 	const args = message.content.split(' ').slice(1).join(' ');
 
 	if (mess.startsWith(PREFIX + 'play')) {
-		if (member.voiceChannel || bot.guilds.get(config.server_id).voiceConnection != null) {
+		if (message.member.voiceChannel || voiceChannel != null) {
 			if (currentlyPlaying || queue.length > 0) {
 				getID(args, (id) => {
 					addToQueue(id);
 					fetchVideoInfo(id, (err, videoInfo) => {
 						if (err) throw new Error(err);
 						message.reply(' Adding to queue: **' + videoInfo.title + '**');
+						queueNames.push(videoInfo.title);
 					});
 				});
 			} else {
 				currentlyPlaying = true;
 				getID(args, (id) => {
 					// need to insert this since queue is empty
-					queue.push('placeholder');
+					queue.push(id);
 					playMusic(id, message);
 					fetchVideoInfo(id, (err, videoInfo) => {
 						if (err) throw new Error(err);
 						message.reply(' Now playing: **' + videoInfo.title + '**');
+						queueNames.push(videoInfo.title);
 					});
 				});
 			}
@@ -145,6 +152,21 @@ bot.on('message', (message) => {
 		} else  {
 			message.reply(' You already voted to skip!');
 		}
+	} else if (mess.startsWith(PREFIX + 'queue')) {
+		const empty = '...'
+		var _message = empty;
+		for (var i = 0; i < queueNames.length; i++) {
+			var temp = (i + 1) + ': ' + queueNames[i] + (i == 0 ? '**(current song)**' : '') + '\n';
+			if ((_message + temp).length <= 2000 - 3) {
+				_message += temp;
+			} else {
+				_message += empty;
+				message.channel.send('_message');
+				_message = empty;
+			}
+		}
+		_message = empty;
+		message.channel.send(_message);
 	}
 });
 
