@@ -54,7 +54,7 @@ function getID(str, cb) {
 }
 
 function addToQueue(strID) {
-	if (isYoutube(str)) {
+	if (isYoutube(strID)) {
 		queue.push(getYoutubeID(strID));
 	} else {
 		queue.push(strID);
@@ -107,26 +107,29 @@ bot.on('message', (message) => {
 	const args = message.content.split(' ').slice(1).join(' ');
 
 	if (mess.startsWith(PREFIX + 'play')) {
-		if (member.voiceChannel || bot.guilds.get(config.server_id));
-		if (currentlyPlaying || queue.length > 0) {
-			getID(args, (id) => {
-				addToQueue(id);
-				fetchVideoInfo(id, (err, videoInfo) => {
-					if (err) throw new Error(err);
-					message.reply(' Adding to queue: **' + videoInfo.title + '**');
+		if (member.voiceChannel || bot.guilds.get(config.server_id).voiceConnection != null) {
+			if (currentlyPlaying || queue.length > 0) {
+				getID(args, (id) => {
+					addToQueue(id);
+					fetchVideoInfo(id, (err, videoInfo) => {
+						if (err) throw new Error(err);
+						message.reply(' Adding to queue: **' + videoInfo.title + '**');
+					});
 				});
-			});
+			} else {
+				currentlyPlaying = true;
+				getID(args, (id) => {
+					// need to insert this since queue is empty
+					queue.push('placeholder');
+					playMusic(id, message);
+					fetchVideoInfo(id, (err, videoInfo) => {
+						if (err) throw new Error(err);
+						message.reply(' Now playing: **' + videoInfo.title + '**');
+					});
+				});
+			}
 		} else {
-			currentlyPlaying = true;
-			getID(args, (id) => {
-				// need to insert this since queue is empty
-				queue.push('placeholder');
-				playMusic(id, message);
-				fetchVideoInfo(id, (err, videoInfo) => {
-					if (err) throw new Error(err);
-					message.reply(' Now playing: **' + videoInfo.title + '**');
-				});
-			});
+			message.reply(' You need to be in a voice channel first');
 		}
 	} else if (mess.startsWith(PREFIX + 'skip')) {
 		// check amount of users who skip and make sure they're already not in queue

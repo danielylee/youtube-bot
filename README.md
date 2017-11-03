@@ -1,5 +1,10 @@
-A simple music bot for Discord
+A Discord music bot written in NodeJS using Youtube Data API. It plays requested songs using the a command followed by search keywords and if a song is already playing it adds it to a queue.
 
-Commands: -play <argument>, -skip
+Commands: 
+-play [argument], -skip
 
-Note: This bot only works for 1 server
+Bugs:
+Only works for one server
+
+
+
