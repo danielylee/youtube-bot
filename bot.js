@@ -155,7 +155,7 @@ bot.on('message', (message) => {
 	} else if (mess.startsWith(PREFIX + 'queue')) {
 		var _message = "```";
 		for (var i = 0; i < queueNames.length; i++) {
-			var temp = (i + 1) + ': ' + queueNames[i] + (i === 0 ? '**(current song)**' : '') + '\n';
+			var temp = (i + 1) + ': ' + queueNames[i] + (i === 0 ? ' **(current song)**' : '') + '\n';
 			if ((_message + temp).length <= 2000 - 3) {
 				_message += temp;
 			} else {
