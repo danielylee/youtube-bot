@@ -153,19 +153,18 @@ bot.on('message', (message) => {
 			message.reply(' You already voted to skip!');
 		}
 	} else if (mess.startsWith(PREFIX + 'queue')) {
-		const empty = '...'
-		var _message = empty;
+		var _message = "```";
 		for (var i = 0; i < queueNames.length; i++) {
-			var temp = (i + 1) + ': ' + queueNames[i] + (i == 0 ? '**(current song)**' : '') + '\n';
+			var temp = (i + 1) + ': ' + queueNames[i] + (i === 0 ? '**(current song)**' : '') + '\n';
 			if ((_message + temp).length <= 2000 - 3) {
 				_message += temp;
 			} else {
-				_message += empty;
-				message.channel.send('_message');
-				_message = empty;
+				_message += "```";
+				message.channel.send(_message);
+				_message = "```";
 			}
 		}
-		_message = empty;
+		_message += "```";
 		message.channel.send(_message);
 	}
 });
